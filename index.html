@@ -1,0 +1,989 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="CHIPS Lab - Communication Hardware & Intelligent Processing Systems, School of Semiconductor Engineering, Chungbuk National University.">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<meta property="og:title" content="CHIPS Lab @ CBNU">
+<meta property="og:description" content="Communication Hardware & Intelligent Processing Systems Lab, Chungbuk National University.">
+<meta property="og:type" content="website">
+<title>CHIPS Lab @ CBNU</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+Condensed:wght@600;700&family=IBM+Plex+Sans+KR:wght@300;400;500;600&display=swap">
+<style>
+:root{
+  --ground:#F1F4F7; --surface:#FFFFFF; --surface-2:#E7EDF3;
+  --ink:#0E1B27; --ink-2:#2B3E4E; --muted:#5C7186; --faint:#8D9FB0;
+  --line:#D8E1E9; --line-soft:#E7EDF2;
+  --signal:#0D5AA7; --signal-ink:#0A4A8C; --signal-wash:rgba(13,90,167,.08);
+  --copper:#A9642F; --copper-wash:rgba(169,100,47,.10);
+  --panel:#071523; --panel-ink:#DCE9F4; --panel-muted:#7F97AC;
+  --panel-line:rgba(255,255,255,.10); --panel-signal:#5FB0EE;
+  --shadow:0 1px 2px rgba(14,27,39,.05), 0 10px 26px -14px rgba(14,27,39,.22);
+  --radius:3px; --maxw:1140px;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --ground:#08121B; --surface:#0F1E2B; --surface-2:#152A3A;
+    --ink:#E3EDF5; --ink-2:#C3D4E1; --muted:#93A9BB; --faint:#6C8399;
+    --line:#1D3346; --line-soft:#152838;
+    --signal:#5FB0EE; --signal-ink:#8AC7F5; --signal-wash:rgba(95,176,238,.10);
+    --copper:#D08A50; --copper-wash:rgba(208,138,80,.12);
+    --panel:#040E17; --panel-line:rgba(255,255,255,.08);
+    --shadow:0 1px 2px rgba(0,0,0,.45), 0 12px 32px -16px rgba(0,0,0,.75);
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#08121B; --surface:#0F1E2B; --surface-2:#152A3A;
+  --ink:#E3EDF5; --ink-2:#C3D4E1; --muted:#93A9BB; --faint:#6C8399;
+  --line:#1D3346; --line-soft:#152838;
+  --signal:#5FB0EE; --signal-ink:#8AC7F5; --signal-wash:rgba(95,176,238,.10);
+  --copper:#D08A50; --copper-wash:rgba(208,138,80,.12);
+  --panel:#040E17; --panel-line:rgba(255,255,255,.08);
+  --shadow:0 1px 2px rgba(0,0,0,.45), 0 12px 32px -16px rgba(0,0,0,.75);
+}
+
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0; background:var(--ground); color:var(--ink);
+  font-family:"IBM Plex Sans KR","IBM Plex Sans",-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  font-size:16px; line-height:1.65; -webkit-font-smoothing:antialiased}
+h1,h2,h3,h4{margin:0; font-family:"IBM Plex Sans Condensed","IBM Plex Sans KR",sans-serif; font-weight:700; letter-spacing:-.012em; text-wrap:balance; line-height:1.16}
+p{margin:0}
+a{color:var(--signal-ink); text-decoration:none}
+a:hover{text-decoration:underline; text-underline-offset:3px}
+:focus-visible{outline:2px solid var(--signal); outline-offset:3px; border-radius:2px}
+img{max-width:100%; display:block}
+.mono{font-family:"IBM Plex Mono",ui-monospace,Menlo,monospace}
+.eyebrow{font-family:"IBM Plex Mono",monospace; font-size:11px; font-weight:500; letter-spacing:.16em; text-transform:uppercase; color:var(--faint)}
+.wrap{max-width:var(--maxw); margin:0 auto; padding:0 28px}
+
+/* top bar */
+.topbar{position:sticky; top:0; z-index:50; background:color-mix(in srgb, var(--ground) 88%, transparent); backdrop-filter:saturate(1.4) blur(10px); border-bottom:1px solid var(--line)}
+.topbar-in{max-width:var(--maxw); margin:0 auto; padding:0 28px; height:62px; display:flex; align-items:center; gap:24px; position:relative}
+.brand{display:flex; align-items:center; gap:11px; color:var(--ink)}
+.brand:hover{text-decoration:none}
+.brand svg{width:30px; height:30px; flex:0 0 auto}
+.brand-tx{display:flex; flex-direction:column; line-height:1.1}
+.brand-name{font-family:"IBM Plex Sans Condensed",sans-serif; font-weight:700; font-size:18px; letter-spacing:.04em}
+.brand-sub{font-family:"IBM Plex Mono",monospace; font-size:9.5px; letter-spacing:.13em; color:var(--faint); text-transform:uppercase}
+nav.main{margin-left:auto; display:flex; gap:2px; align-items:center}
+nav.main a{font-family:"IBM Plex Mono",monospace; font-size:12px; letter-spacing:.05em; color:var(--muted); padding:7px 11px; border-radius:var(--radius)}
+nav.main a:hover{color:var(--ink); background:var(--surface-2); text-decoration:none}
+nav.main a.active{color:var(--signal-ink); background:var(--signal-wash)}
+.navtoggle{display:none; margin-left:auto; background:none; border:1px solid var(--line); color:var(--ink); border-radius:var(--radius); padding:7px 11px; font-family:"IBM Plex Mono",monospace; font-size:12px; cursor:pointer}
+
+/* hero */
+.hero{position:relative; background:var(--panel); color:var(--panel-ink); overflow:hidden}
+#wavefield{position:absolute; inset:0; width:100%; height:100%; display:block}
+.hero-in{position:relative; max-width:var(--maxw); margin:0 auto; padding:clamp(60px,8.5vw,112px) 28px clamp(52px,7vw,80px)}
+.hero-tag{color:var(--panel-muted); margin-bottom:18px}
+.hero h1{font-size:clamp(32px,5vw,56px); line-height:1.05; letter-spacing:-.024em; color:#fff; max-width:15ch}
+.hero h1 .amp{color:var(--panel-signal); font-weight:600}
+.hero-expand{margin-top:20px; font-family:"IBM Plex Mono",monospace; font-size:clamp(12px,1.35vw,14px); letter-spacing:.02em; color:#9FBBD2; max-width:52ch; line-height:1.9}
+.hero-expand b{color:var(--panel-signal); font-weight:600}
+.hero-lede{margin-top:26px; max-width:54ch; color:#B7CCDE; font-weight:300; font-size:clamp(15px,1.5vw,17px)}
+.hero-meta{margin-top:32px; display:flex; flex-wrap:wrap; gap:9px}
+.chip{font-family:"IBM Plex Mono",monospace; font-size:11px; letter-spacing:.09em; text-transform:uppercase; padding:6px 10px; border:1px solid var(--panel-line); border-radius:var(--radius); color:#A2BCD1; background:rgba(255,255,255,.03)}
+
+/* sections */
+.page{display:none}
+.page.on{display:block; animation:fade .32s ease both}
+@keyframes fade{from{opacity:0; transform:translateY(6px)}to{opacity:1; transform:none}}
+section.band{padding:clamp(46px,5.5vw,72px) 0; border-bottom:1px solid var(--line-soft)}
+section.band.last{border-bottom:0}
+.grid-rail{display:grid; grid-template-columns:148px minmax(0,1fr); gap:clamp(22px,4vw,52px); align-items:start}
+.rail-label{position:sticky; top:86px}
+.rail-label .eyebrow{display:block}
+.rail-label .rule{height:1px; background:var(--line); margin-top:11px}
+.stack{display:flex; flex-direction:column; gap:22px}
+.stack-lg{display:flex; flex-direction:column; gap:38px}
+h2.sec{font-size:clamp(23px,3vw,31px); letter-spacing:-.018em}
+.prose{max-width:66ch; color:var(--ink-2); font-weight:300}
+.prose + .prose{margin-top:14px}
+.prose.ko{color:var(--muted); font-size:15px}
+.lang{font-family:"IBM Plex Mono",monospace; font-size:10px; letter-spacing:.14em; color:var(--faint); text-transform:uppercase; display:block; margin-bottom:5px}
+
+.callout{background:var(--surface); border:1px solid var(--line); border-left:3px solid var(--copper); border-radius:var(--radius); padding:22px 24px; box-shadow:var(--shadow)}
+.callout h3{font-size:17px; margin-bottom:10px}
+.callout .eyebrow{color:var(--copper); display:block; margin-bottom:8px}
+
+/* research areas */
+.areas{display:grid; grid-template-columns:repeat(auto-fit,minmax(258px,1fr)); gap:1px; background:var(--line); border:1px solid var(--line); border-radius:var(--radius); overflow:hidden}
+.area{background:var(--surface); padding:24px 22px; display:flex; flex-direction:column; gap:11px; transition:background .18s}
+.area:hover{background:var(--surface-2)}
+.area .tag{font-family:"IBM Plex Mono",monospace; font-size:10px; letter-spacing:.14em; color:var(--signal-ink); background:var(--signal-wash); padding:3px 7px; border-radius:2px; align-self:flex-start}
+.area h3{font-size:17px}
+.area ul{margin:0; padding-left:16px; color:var(--muted); font-size:14.5px; font-weight:300; display:flex; flex-direction:column; gap:7px}
+.area li::marker{color:var(--faint)}
+
+/* people */
+.rgroup h4{font-family:"IBM Plex Mono",monospace; font-size:11px; font-weight:600; letter-spacing:.16em; text-transform:uppercase; color:var(--signal-ink); margin-bottom:12px}
+.namegrid{display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); gap:12px 24px; border-top:1px solid var(--line); padding-top:14px}
+.namegrid span{font-family:"IBM Plex Sans Condensed",sans-serif; font-weight:600; font-size:16.5px}
+.portrait{aspect-ratio:3/4; border-radius:var(--radius); border:1px solid var(--line); background:var(--surface-2); position:relative; overflow:hidden; display:flex; align-items:center; justify-content:center}
+.portrait img{width:100%; height:100%; object-fit:cover}
+.portrait .ini{font-family:"IBM Plex Sans Condensed",sans-serif; font-weight:700; font-size:34px; color:var(--faint); letter-spacing:.04em; z-index:1}
+.portrait::after{content:""; position:absolute; inset:0; pointer-events:none;
+  background-image:linear-gradient(var(--line-soft) 1px,transparent 1px),linear-gradient(90deg,var(--line-soft) 1px,transparent 1px);
+  background-size:20px 20px; opacity:.6}
+.portrait.has-photo::after{display:none}
+.pi{display:grid; grid-template-columns:210px minmax(0,1fr); gap:34px; align-items:start}
+.pi-name{font-size:26px}
+.pi-role{color:var(--muted); font-size:15px; margin-top:4px}
+.pi-mail{font-family:"IBM Plex Mono",monospace; font-size:13px; margin-top:8px; display:inline-block}
+.deflist{display:flex; flex-direction:column; gap:24px; margin-top:26px}
+.deflist h4{font-family:"IBM Plex Mono",monospace; font-size:11px; font-weight:600; letter-spacing:.16em; text-transform:uppercase; color:var(--signal-ink); margin-bottom:10px}
+.deflist ul{margin:0; padding:0; list-style:none; display:flex; flex-direction:column; gap:9px}
+.deflist li{font-size:14.5px; color:var(--ink-2); font-weight:300; padding-left:16px; position:relative}
+.deflist li::before{content:""; position:absolute; left:0; top:.72em; width:6px; height:1px; background:var(--faint)}
+.deflist li b{font-weight:500; color:var(--ink)}
+.deflist li .yr{font-family:"IBM Plex Mono",monospace; font-size:12.5px; color:var(--muted)}
+.alumni{border-top:1px solid var(--line)}
+.alum{display:grid; grid-template-columns:170px minmax(0,1fr) minmax(0,1fr); gap:20px; padding:14px 0; border-bottom:1px solid var(--line-soft); align-items:baseline}
+.alum .nm{font-family:"IBM Plex Sans Condensed",sans-serif; font-weight:600; font-size:15.5px}
+.alum .dg{font-family:"IBM Plex Mono",monospace; font-size:12.5px; color:var(--muted)}
+.alum .po{font-size:14px; color:var(--ink-2); font-weight:300}
+
+/* projects */
+.proj{border:1px solid var(--line); border-radius:var(--radius); background:var(--surface); box-shadow:var(--shadow); overflow:hidden}
+.proj-head{padding:22px 24px 20px; display:flex; flex-direction:column; gap:10px}
+.proj-meta{display:flex; flex-wrap:wrap; gap:8px; align-items:center}
+.pill{font-family:"IBM Plex Mono",monospace; font-size:10.5px; letter-spacing:.11em; text-transform:uppercase; padding:4px 8px; border-radius:2px}
+.pill.on{background:var(--signal-wash); color:var(--signal-ink)}
+.pill.off{background:var(--surface-2); color:var(--muted)}
+.pill.org{border:1px solid var(--line); color:var(--muted)}
+.proj h3{font-size:18px}
+.proj .ko-title{font-size:14px; color:var(--muted); font-weight:300; margin-top:3px}
+.proj-body{padding:18px 24px 22px; border-top:1px solid var(--line-soft)}
+.proj-body .prose{font-size:14.5px}
+.proj-body h4{font-family:"IBM Plex Mono",monospace; font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--copper); margin:18px 0 8px}
+.proj-body ul{margin:0; padding-left:17px; color:var(--muted); font-size:14px; font-weight:300; display:flex; flex-direction:column; gap:6px}
+details.proj-more summary{cursor:pointer; list-style:none; font-family:"IBM Plex Mono",monospace; font-size:11.5px; letter-spacing:.1em; text-transform:uppercase; color:var(--signal-ink); padding:13px 24px; border-top:1px solid var(--line-soft)}
+details.proj-more summary::-webkit-details-marker{display:none}
+details.proj-more summary::before{content:"+ "}
+details.proj-more[open] summary::before{content:"\2212 "}
+details.proj-more[open] summary{color:var(--muted)}
+.proj-simple{display:grid; grid-template-columns:minmax(0,1fr) auto; gap:16px; padding:15px 0; border-bottom:1px solid var(--line-soft); align-items:baseline}
+.proj-simple .t{font-size:15px; font-weight:400}
+.proj-simple .m{font-family:"IBM Plex Mono",monospace; font-size:12px; color:var(--muted); white-space:nowrap}
+
+/* publications */
+.filters{display:flex; flex-wrap:wrap; gap:8px; margin-bottom:6px}
+.filters button{font-family:"IBM Plex Mono",monospace; font-size:11px; letter-spacing:.09em; text-transform:uppercase; padding:7px 12px; border:1px solid var(--line); background:var(--surface); color:var(--muted); border-radius:var(--radius); cursor:pointer; transition:all .15s}
+.filters button:hover{color:var(--ink); border-color:var(--faint)}
+.filters button[aria-pressed="true"]{background:var(--signal); border-color:var(--signal); color:#fff}
+.pubgroup h3{font-family:"IBM Plex Mono",monospace; font-size:11px; font-weight:600; letter-spacing:.16em; text-transform:uppercase; color:var(--copper); margin-bottom:2px}
+.publist{list-style:none; margin:0; padding:0; border-top:1px solid var(--line)}
+.pub{display:grid; grid-template-columns:58px minmax(0,1fr); gap:18px; padding:15px 0; border-bottom:1px solid var(--line-soft)}
+.pub .yr{font-family:"IBM Plex Mono",monospace; font-size:12.5px; color:var(--faint); font-variant-numeric:tabular-nums; padding-top:2px}
+.pub .cit{font-size:14.8px; font-weight:300; color:var(--ink-2); line-height:1.6}
+.pub .cit b{font-weight:600; color:var(--ink)}
+.pub .venue{color:var(--ink); font-weight:400}
+.pub .doi{font-family:"IBM Plex Mono",monospace; font-size:11.5px; color:var(--faint); display:inline-block; margin-top:3px}
+.pub .status{font-family:"IBM Plex Mono",monospace; font-size:10.5px; letter-spacing:.1em; text-transform:uppercase; color:var(--copper); background:var(--copper-wash); padding:2px 6px; border-radius:2px; margin-left:6px; white-space:nowrap}
+.note{font-size:13px; color:var(--faint); font-weight:300}
+
+/* contact + footer */
+.contact-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(210px,1fr)); gap:26px}
+.cbox .eyebrow{display:block; margin-bottom:7px}
+.cbox .v{font-size:15.5px; color:var(--ink-2); font-weight:300}
+footer{background:var(--panel); color:var(--panel-muted); padding:38px 0}
+footer .wrap{display:flex; flex-wrap:wrap; gap:16px; justify-content:space-between; align-items:center}
+footer .f-brand{font-family:"IBM Plex Sans Condensed",sans-serif; font-weight:700; color:#fff; font-size:16px; letter-spacing:.04em}
+footer .f-meta{font-family:"IBM Plex Mono",monospace; font-size:11.5px; letter-spacing:.05em}
+footer a{color:var(--panel-signal)}
+
+
+/* features & figures */
+.feature{background:var(--surface); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow); padding:24px; display:flex; flex-direction:column; gap:16px; margin-top:6px}
+.feature h3{font-size:20px}
+.feature .src{font-family:"IBM Plex Mono",monospace; font-size:11px; letter-spacing:.08em; color:var(--faint)}
+.stats{display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); border-top:1px solid var(--line); border-bottom:1px solid var(--line)}
+.stat{padding:14px 14px 12px 0; display:flex; flex-direction:column; gap:2px}
+.stat + .stat{padding-left:14px; border-left:1px solid var(--line-soft)}
+.stat b{font-family:"IBM Plex Sans Condensed",sans-serif; font-weight:700; font-size:24px; color:var(--signal-ink); font-variant-numeric:tabular-nums; line-height:1.15}
+.stat span{font-family:"IBM Plex Mono",monospace; font-size:10.5px; letter-spacing:.08em; text-transform:uppercase; color:var(--muted)}
+.figs{display:grid; gap:14px}
+.figs.a{grid-template-columns:minmax(0,1fr) minmax(0,1.333fr)}
+.figs.b{grid-template-columns:minmax(0,1fr) minmax(0,1.389fr)}
+.figs.c1{grid-template-columns:minmax(0,1fr)}
+.figs.c{grid-template-columns:minmax(0,1fr) minmax(0,3.14fr)}
+figure{margin:0; display:flex; flex-direction:column; gap:8px}
+figure .frame{border:1px solid var(--line); border-radius:var(--radius); overflow:hidden; background:#fff}
+figure img, figure video{width:100%; height:100%; display:block; object-fit:cover}
+figure.contain img{object-fit:contain}
+figcaption{font-size:12.5px; color:var(--muted); font-weight:300; line-height:1.5}
+figcaption b{font-family:"IBM Plex Mono",monospace; font-size:10.5px; letter-spacing:.1em; text-transform:uppercase; color:var(--faint); font-weight:500; margin-right:6px}
+.hl{display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:20px}
+.hlcard{background:var(--surface); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow); overflow:hidden; display:flex; flex-direction:column; color:var(--ink); transition:transform .18s, box-shadow .18s}
+.hlcard:hover{text-decoration:none; transform:translateY(-2px)}
+.hlcard .im{aspect-ratio:16/9; overflow:hidden; background:var(--surface-2)}
+.hlcard .im img{width:100%; height:100%; object-fit:cover}
+.hlcard .tx{padding:18px 20px 20px; display:flex; flex-direction:column; gap:8px}
+.hlcard .tag{font-family:"IBM Plex Mono",monospace; font-size:10px; letter-spacing:.14em; color:var(--signal-ink); background:var(--signal-wash); padding:3px 7px; border-radius:2px; align-self:flex-start}
+.hlcard h3{font-size:17px}
+.hlcard p{font-size:14px; color:var(--muted); font-weight:300}
+.pill.role{background:var(--copper-wash); color:var(--copper)}
+
+.launch{display:grid; grid-template-columns:minmax(0,1.35fr) minmax(0,1fr); background:var(--panel); color:#fff; border-radius:var(--radius); overflow:hidden; box-shadow:var(--shadow)}
+.launch:hover{text-decoration:none}
+.launch .im{min-height:230px; background:#040d18}
+.launch .im img{width:100%; height:100%; object-fit:cover}
+.launch .tx{padding:26px 26px 24px; display:flex; flex-direction:column; gap:10px; justify-content:center}
+.launch .tag{font-family:"IBM Plex Mono",monospace; font-size:10px; letter-spacing:.14em; padding:3px 7px; border-radius:2px; align-self:flex-start}
+.launch h3{font-size:21px; color:#fff}
+.launch p{font-size:14.5px; color:#B7CCDE; font-weight:300}
+@media (max-width:860px){
+  .grid-rail{grid-template-columns:1fr; gap:16px}
+  .rail-label{position:static}
+  .pi{grid-template-columns:1fr; gap:20px}
+  .pi .portrait{max-width:190px}
+  .alum{grid-template-columns:1fr; gap:3px; padding:15px 0}
+  .namegrid{grid-template-columns:1fr}
+  .launch{grid-template-columns:1fr}
+  .figs.a,.figs.b,.figs.c{grid-template-columns:1fr}
+  .stat + .stat{padding-left:0; border-left:0}
+  nav.main{display:none}
+  nav.main.open{display:flex; position:absolute; top:62px; left:0; right:0; flex-direction:column; align-items:stretch; background:var(--surface); border-bottom:1px solid var(--line); padding:10px 20px 16px; gap:2px; z-index:60}
+  .navtoggle{display:block}
+}
+@media (prefers-reduced-motion:reduce){*{animation-duration:.001ms !important; transition-duration:.001ms !important}}
+</style>
+
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><symbol id="mk" viewBox="0 0 32 32">
+  <g fill="none" stroke="currentColor" stroke-linecap="round">
+    <path d="M4.5 20A11.5 11.5 0 0 1 27.5 20" stroke-width="1.5" opacity=".38"/>
+    <path d="M8 20A8 8 0 0 1 24 20" stroke-width="1.8" opacity=".62"/>
+    <path d="M11.5 20A4.5 4.5 0 0 1 20.5 20" stroke-width="2.1"/>
+    <path d="M16 23.4V27.5M12.2 27.5h7.6" stroke-width="1.7"/>
+  </g>
+  <circle cx="16" cy="21.4" r="2.5" fill="currentColor"/>
+  <circle cx="16" cy="21.4" r="1.1" fill="var(--surface,#fff)"/>
+</symbol></svg>
+
+<header class="topbar">
+  <div class="topbar-in">
+    <a class="brand" href="#home">
+      <svg style="color:var(--signal)"><use href="#mk"></use></svg>
+      <span class="brand-tx">
+        <span class="brand-name">CHIPS<span style="color:var(--faint);font-weight:600"> LAB</span></span>
+        <span class="brand-sub">Chungbuk Nat&rsquo;l University</span>
+      </span>
+    </a>
+    <button class="navtoggle" aria-expanded="false" aria-controls="mainnav">MENU</button>
+    <nav class="main" id="mainnav">
+      <a href="#home">Home</a>
+      <a href="#research">Research</a>
+      <a href="#people">People</a>
+      <a href="#projects">Projects</a>
+      <a href="#publications">Publications</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+<!-- ======================= HOME ======================= -->
+<div class="page" id="page-home">
+  <div class="hero">
+    <canvas id="wavefield" aria-hidden="true"></canvas>
+    <div class="hero-in">
+      <p class="eyebrow hero-tag">School of Semiconductor Engineering &middot; Chungbuk National University</p>
+      <h1>From theory to<br>working silicon <span class="amp">&amp;</span> spectrum.</h1>
+      <p class="hero-expand">
+        <b>C</b>ommunication <b>H</b>ardware &amp; <b>I</b>ntelligent <b>P</b>rocessing <b>S</b>ystems
+      </p>
+      <p class="hero-lede">
+        We design, prototype, and implement wireless communication and signal
+        processing systems &mdash; and we build the hardware that runs them.
+      </p>
+      <div class="hero-meta">
+        <span class="chip">5G / 6G</span>
+        <span class="chip">FPGA Modem</span>
+        <span class="chip">Space Optical</span>
+        <span class="chip">ISAC</span>
+        <span class="chip">Edge AI</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <section class="band">
+      <div class="grid-rail">
+        <div class="rail-label"><span class="eyebrow">01 / About</span><div class="rule"></div></div>
+        <div class="stack">
+          <h2 class="sec">Bridging the gap between theory and implementation.</h2>
+          <div>
+            <span class="lang">EN</span>
+            <p class="prose">CHIPS Lab focuses on closing the distance between theoretical research and
+            real-world implementation. Our primary goal is to design, prototype, and implement cutting-edge
+            algorithms and systems for wireless communication and signal processing applications. Beyond
+            academic research, we aim to produce solutions that are practical and applicable in real
+            environments, with an emphasis on system-level development and prototyping.</p>
+            <p class="prose">The lab specializes not only in wireless communication but also in signal
+            processing and deep learning. Our research revolves around optimizing and deploying advanced
+            algorithms on edge devices, and building platforms to evaluate their real-world feasibility.</p>
+          </div>
+          <div>
+            <span class="lang">KO</span>
+            <p class="prose ko">CHIPS 연구실은 이론적 연구와 실제 구현 간의 간극을 줄이는 것에 중점을 두고 있습니다.
+            본 연구실의 주요 목표는 다양한 무선 통신 및 신호 처리 응용 분야의 알고리즘과 시스템을 설계,
+            프로토타이핑, 구현하는 것입니다. 학문적 연구를 넘어, 실제 환경에 적용 가능한 실용적인 솔루션을
+            개발하는 데 주력합니다. 무선 통신뿐만 아니라 신호 처리 및 딥러닝 분야에서도 전문성을 가지고 있으며,
+            엣지 디바이스에서 신호처리 및 딥러닝 알고리즘을 최적화하고 배포하는 연구를 수행합니다.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="band">
+      <div class="grid-rail">
+        <div class="rail-label"><span class="eyebrow">02 / Join us</span><div class="rule"></div></div>
+        <div class="callout">
+          <span class="eyebrow">We are recruiting</span>
+          <h3>학부연구생 &middot; 대학원생 &middot; 박사후연구원을 모집합니다</h3>
+          <p class="prose" style="font-size:15px">충북대학교 반도체공학부 CHIPS 연구실은 열정있는 학부연구생과
+          대학원생, 박사후연구원을 모집합니다. 관심있는 분들은
+          <a href="mailto:jh.noh@cbnu.ac.kr">jh.noh@cbnu.ac.kr</a> 로 간단한 자기 소개를 담아 연락 바랍니다.</p>
+          <p class="prose" style="font-size:14.5px; margin-top:12px; color:var(--muted)">The CHIPS Lab at the
+          School of Semiconductor Engineering, Chungbuk National University, is looking for passionate
+          undergraduate researchers, graduate students, and postdoctoral researchers to join our team.
+          If you are interested, please send a brief self-introduction to
+          <a href="mailto:jh.noh@cbnu.ac.kr">jh.noh@cbnu.ac.kr</a>.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="band">
+      <div class="grid-rail">
+        <div class="rail-label"><span class="eyebrow">03 / Focus</span><div class="rule"></div></div>
+        <div class="stack">
+          <h2 class="sec">Six things we work on</h2>
+          <div class="areas">
+            <div class="area"><span class="tag">COMM</span><h3>Wireless Prototyping</h3>
+              <ul><li>5G/6G, MIMO, mmWave algorithm design</li><li>Real-time prototypes for performance evaluation</li></ul></div>
+            <div class="area"><span class="tag">FPGA</span><h3>Hardware Signal Processing</h3>
+              <ul><li>High-performance modems on FPGA</li><li>Parallel processing &amp; hardware acceleration</li></ul></div>
+            <div class="area"><span class="tag">FSO</span><h3>Space Optical Comm.</h3>
+              <ul><li>CCSDS-based system design</li><li>FPGA optical modems, tracking &amp; alignment</li></ul></div>
+            <div class="area"><span class="tag">SAT</span><h3>Satellite Communication</h3>
+              <ul><li>X-band transmitter for a LEO satellite</li><li>Launching July 2028 on SpaceX</li></ul></div>
+            <div class="area"><span class="tag">ISAC</span><h3>Integrated Sensing</h3>
+              <ul><li>Joint communication and sensing for 6G</li><li>Vehicles, smart cities, satellites</li></ul></div>
+            <div class="area"><span class="tag">EDGE AI</span><h3>Deep Learning on Edge</h3>
+              <ul><li>Lightweight models for constrained devices</li><li>Real-time inference &amp; anomaly detection</li></ul></div>
+          </div>
+          <p class="note">Full descriptions on the <a href="#research">Research</a> page.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="band last">
+      <div class="grid-rail">
+        <div class="rail-label"><span class="eyebrow">04 / Highlights</span><div class="rule"></div></div>
+        <div class="stack">
+          <h2 class="sec">Recent work, running on real hardware</h2>
+          <a class="launch" href="#research">
+            <div class="im"><img src="media/sat-leo-xband.jpg" alt="Satellite X-band downlink illustration" loading="lazy"></div>
+            <div class="tx"><span class="tag" style="color:var(--copper);background:var(--copper-wash)">SAT &middot; Launch 2028.07</span>
+              <h3>Our X-band transmitter is going to orbit</h3>
+              <p>Embedded software and signal processing for the X-band transmitter on OnB Space&rsquo;s LEO satellite, launching on SpaceX in July 2028.</p></div>
+          </a>
+          <div class="hl">
+            <a class="hlcard" href="#research"><div class="im"><img src="media/ccsds-lab.jpg" alt="CCSDS laser transceiver on the optical bench" loading="lazy"></div>
+              <div class="tx"><span class="tag">FSO &middot; APISAT 2026</span><h3>CCSDS laser transceiver on one RFSoC</h3>
+              <p>Full O3K-LDPC transmit and receive chain at 1.97&nbsp;Gsym/s, error-free across 42 billion payload bits on the optical bench.</p></div></a>
+            <a class="hlcard" href="#research"><div class="im"><img src="media/isac-bench.jpg" alt="28 GHz ISAC testbed on the optical table" loading="lazy"></div>
+              <div class="tx"><span class="tag">ISAC &middot; 28 GHz</span><h3>Sensing and communication from one waveform</h3>
+              <p>QPSK data and radar ranging from the same OFDM symbols, with a walking person tracked in real time on the FPGA.</p></div></a>
+            <a class="hlcard" href="#research"><div class="im"><img src="media/edgeai-gate.jpg" alt="Laboratory security gate" loading="lazy" style="object-position:50% 40%"></div>
+              <div class="tx"><span class="tag">EDGE AI &middot; Industry</span><h3>Edge AI for security gates</h3>
+              <p>A learned detector finds security paper under phone and tablet signals: 1.7&times; the detection rate of the rule-based system.</p></div></a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
+
+<!-- ======================= RESEARCH ======================= -->
+<div class="page" id="page-research">
+  <div class="wrap">
+    <section class="band">
+      <div class="grid-rail">
+        <div class="rail-label"><span class="eyebrow">Overview</span><div class="rule"></div></div>
+        <div class="stack">
+          <h2 class="sec">Research</h2>
+          <p class="prose">CHIPS Lab focuses on bridging the gap between theoretical research and real-world
+          implementation. Our primary goal is to design, prototype, and implement cutting-edge algorithms and
+          systems for various wireless communication and signal processing applications. Beyond academic
+          research, we aim to produce solutions that are practical and applicable in real-world environments,
+          with an emphasis on system-level development and prototyping.</p>
+          <p class="prose">The lab specializes not only in wireless communication but also in signal processing
+          and deep learning. Our research revolves around optimizing and deploying advanced algorithms on edge
+          devices and developing platforms to evaluate their real-world feasibility.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="band last">
+      <div class="grid-rail">
+        <div class="rail-label"><span class="eyebrow">Areas</span><div class="rule"></div></div>
+        <div class="stack-lg">
+
+          <div class="stack" style="gap:12px">
+            <span class="eyebrow" style="color:var(--signal-ink)">COMM &mdash; Prototyping Wireless Communication Systems</span>
+            <ul class="area-list" style="margin:0;padding-left:18px;color:var(--ink-2);font-weight:300;display:flex;flex-direction:column;gap:8px">
+              <li>Development and optimization of algorithms for 5G/6G, MIMO, mmWave, and other wireless communication systems.</li>
+              <li>Building and validating real-time wireless communication prototypes for performance evaluation.</li>
+            </ul>
+          </div>
+
+          <div class="stack" style="gap:12px">
+            <span class="eyebrow" style="color:var(--signal-ink)">FPGA &mdash; FPGA-Based Communication and Signal Processing</span>
+            <ul style="margin:0;padding-left:18px;color:var(--ink-2);font-weight:300;display:flex;flex-direction:column;gap:8px">
+              <li>Design and implementation of high-performance modems and signal processing algorithms on FPGA platforms.</li>
+              <li>Hardware acceleration for real-time communication through parallel data processing and optimization.</li>
+            </ul>
+          </div>
+
+          <div class="stack" style="gap:12px">
+            <span class="eyebrow" style="color:var(--signal-ink)">FSO &mdash; Optical Communications for Space Systems</span>
+            <ul style="margin:0;padding-left:18px;color:var(--ink-2);font-weight:300;display:flex;flex-direction:column;gap:8px">
+              <li>Design and optimization of space optical communication systems based on CCSDS standards.</li>
+              <li>FPGA-based optical communication modem development for high-speed data transmission.</li>
+              <li>Research on optical transceiver technologies for satellite communication and space exploration.</li>
+            </ul>
+            <div class="feature">
+              <span class="src">Featured &middot; APISAT 2026</span>
+              <h3>FPGA-based CCSDS laser communication transceiver</h3>
+              <p class="prose" style="font-size:15px">The complete CCSDS&nbsp;142.0 O3K-LDPC transmit and receive chain runs on a single RFSoC (ZCU111) as one continuous stream, with code rate, interleaver depth and repetition switchable at run time. A receiver front-end of our own design recovers timing without pilot symbols and re-acquires the frame header every frame. In functional checks on a 30-cm optical bench, more than 42 billion payload bits were compared with no bit errors and no missing packets.</p>
+              <div class="stats">
+                <div class="stat"><b>1.97 Gsym/s</b><span>symbol rate</span></div>
+                <div class="stat"><b>3.93 GS/s</b><span>RF converters</span></div>
+                <div class="stat"><b>0 errors</b><span>over 4.2&times;10<sup>10</sup> bits</span></div>
+                <div class="stat"><b>18.1 %</b><span>device LUTs</span></div>
+              </div>
+              <div class="figs b">
+                <figure><div class="frame"><img src="media/ccsds-bench.jpg" alt="Optical bench with MX10B transmitter, collimator pair, ZCU111 board and RXM10BF photoreceiver" loading="lazy" width="999" height="780"></div>
+                  <figcaption><b>Bench</b>MX10B transmitter, collimator pair over 30&nbsp;cm of free space, RXM10BF photoreceiver, ZCU111.</figcaption></figure>
+                <figure><div class="frame"><video class="demo" src="media/ccsds-demo.mp4" poster="media/ccsds-demo-poster.jpg" autoplay muted loop playsinline preload="metadata" aria-label="Live demo: video streamed through the transceiver chain on the RFSoC board"></video></div>
+                  <figcaption><b>Live demo</b>Video streamed in real time through the transmit and receive chains on the RFSoC board.</figcaption></figure>
+              </div>
+              <div class="figs c1">
+                <figure class="contain"><div class="frame"><img src="media/ccsds-architecture.jpg" alt="Block diagram of transmit and receive chains on the RFSoC" loading="lazy" width="1700" height="867"></div>
+                  <figcaption><b>Architecture</b>Both chains on one RFSoC: SD-FEC LDPC cores, DDR4 interleaving, RF-DAC/ADC at 3.93&nbsp;GS/s.</figcaption></figure>
+              </div>
+              <p class="note">D. Oh, J. Yoo, Y. Choi, J. Noh, &ldquo;An FPGA-Based CCSDS Laser Communication Transceiver: Design and Experimental Results,&rdquo; APISAT 2026.</p>
+            </div>
+          </div>
+
+          <div class="stack" style="gap:12px">
+            <span class="eyebrow" style="color:var(--signal-ink)">SAT &mdash; Satellite Communication</span>
+            <ul style="margin:0;padding-left:18px;color:var(--ink-2);font-weight:300;display:flex;flex-direction:column;gap:8px">
+              <li>Embedded software and signal processing logic for an X-band satellite transmitter.</li>
+              <li>Data transmission and reception for small observation satellites.</li>
+            </ul>
+            <div class="feature">
+              <span class="src">Featured &middot; Flight hardware with OnB Space</span>
+              <h3>X-band transmitter for a LEO satellite, launching July 2028</h3>
+              <p class="prose" style="font-size:15px">We develop the embedded software and signal processing logic of the X-band transmitter that will fly on a low-Earth-orbit satellite built by OnB Space. The transmitter carries the satellite&rsquo;s data down to the ground station, and the satellite is scheduled to launch on a SpaceX rocket in July 2028 &mdash; logic designed in our lab, running in orbit.</p>
+              <div class="stats">
+                <div class="stat"><b>X-band</b><span>space-to-ground link</span></div>
+                <div class="stat"><b>LEO</b><span>low Earth orbit</span></div>
+                <div class="stat"><b>2028.07</b><span>launch on SpaceX</span></div>
+                <div class="stat"><b>2026&ndash;28</b><span>development</span></div>
+              </div>
+              <div class="figs c1">
+                <figure class="contain"><div class="frame" style="background:#040d18"><img src="media/sat-leo-xband.jpg" alt="Illustration: a satellite in low Earth orbit sends an X-band downlink to a ground station in Korea" loading="lazy" width="1600" height="693"></div>
+                  <figcaption><b>Concept</b>X-band downlink from a LEO satellite to a ground station (illustration; Earth imagery NASA Blue Marble).</figcaption></figure>
+              </div>
+            </div>
+          </div>
+
+          <div class="stack" style="gap:12px">
+            <span class="eyebrow" style="color:var(--signal-ink)">ISAC &mdash; Integrated Sensing and Communication</span>
+            <ul style="margin:0;padding-left:18px;color:var(--ink-2);font-weight:300;display:flex;flex-direction:column;gap:8px">
+              <li>Development of integrated communication and sensing systems for 6G.</li>
+              <li>Prototyping ISAC platforms and validating their performance in real-world scenarios.</li>
+              <li>Applications in autonomous vehicles, smart cities, and satellite systems.</li>
+            </ul>
+            <div class="feature">
+              <span class="src">Featured &middot; Testbed</span>
+              <h3>28 GHz ISAC testbed with real-time FPGA sensing</h3>
+              <p class="prose" style="font-size:15px">One OFDM waveform does two jobs at once: its 242 subcarriers carry QPSK data, and the same symbols serve as a radar probe. Range profiles are computed on the FPGA in real time, tracking a person walking between 2 and 12&nbsp;m from the antennas while the data is demodulated from the very same symbols.</p>
+              <div class="figs a">
+                <figure><div class="frame"><img src="media/isac-bench.jpg" alt="Three 28 GHz beamforming RF modules on an optical table" loading="lazy" width="1200" height="900"></div>
+                  <figcaption><b>Hardware</b>28&nbsp;GHz beamforming RF modules driven by an RFSoC baseband.</figcaption></figure>
+                <figure><div class="frame"><video class="demo" src="media/isac-demo.mp4" poster="media/isac-demo-poster.jpg" autoplay muted loop playsinline preload="metadata" aria-label="Live ISAC demo: raw I/Q, QPSK constellation, range profile and range-time map while a person walks"></video></div>
+                  <figcaption><b>Live demo</b>&#9312; received I/Q &middot; &#9313; QPSK constellation of the same symbol &middot; &#9314; range profile against the empty scene &middot; &#9315; range&ndash;time map of a person walking, computed on the FPGA.</figcaption></figure>
+              </div>
+            </div>
+          </div>
+
+          <div class="stack" style="gap:12px">
+            <span class="eyebrow" style="color:var(--signal-ink)">EDGE AI &mdash; Deep Learning Applications on Edge Devices</span>
+            <ul style="margin:0;padding-left:18px;color:var(--ink-2);font-weight:300;display:flex;flex-direction:column;gap:8px">
+              <li>Optimizing and implementing deep learning algorithms for resource-constrained edge devices.</li>
+              <li>Designing lightweight models for real-time data processing and various AI applications.</li>
+            </ul>
+            <div class="feature">
+              <span class="src">Featured &middot; Industry project with Anysell</span>
+              <h3>Edge-AI detection of security paper at walk-through gates</h3>
+              <p class="prose" style="font-size:15px">Security paper carries a soft-magnetic strip whose Barkhausen response is easily buried under the signal of a phone or tablet carried through the same gate. We replaced the rule-based detector with a learned model: a front-end filter initialised from the hand-designed detector, a CNN/Conformer encoder and an autoencoder regulariser. Validated on objects never seen in training, it lifts the detection rate from 46.4&nbsp;% to 79.3&nbsp;% at the same 10&nbsp;% false-alarm rate. The lightweight variant is sized for int8 inference on a microcontroller, and a single-FPGA design that combines excitation, DSP and inference is under way.</p>
+              <div class="stats">
+                <div class="stat"><b>0.916</b><span>AUC, unseen objects</span></div>
+                <div class="stat"><b>1.7&times;</b><span>detection vs rules</span></div>
+                <div class="stat"><b>93.8 %</b><span>paper alone</span></div>
+                <div class="stat"><b>13,763</b><span>measured events</span></div>
+              </div>
+              <div class="figs c">
+                <figure><div class="frame"><img src="media/edgeai-gate.jpg" alt="Laboratory walk-through security gate with transmit and receive coils" loading="lazy" width="900" height="1200"></div>
+                  <figcaption><b>Gate</b>Lab-scale walk-through gate with excitation and receive coils.</figcaption></figure>
+                <figure class="contain"><div class="frame"><img src="media/edgeai-gate-timeline.jpg" alt="Continuous detection timeline: signal level and paper probability over 74 seconds of gate passes" loading="lazy" width="1600" height="679"></div>
+                  <figcaption><b>Continuous inference</b>74&nbsp;s of passes carrying paper together with a phone: every pass raises the paper score (red), and the score stays at zero between passes.</figcaption></figure>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
+
+<!-- ======================= PEOPLE ======================= -->
+<div class="page" id="page-people">
+  <div class="wrap">
+    <section class="band">
+      <div class="grid-rail">
+        <div class="rail-label"><span class="eyebrow">Principal Investigator</span><div class="rule"></div></div>
+        <div class="pi">
+          <div class="portrait has-photo"><img src="photos/pi.jpg" alt="Noh, Junghoon" width="540" height="720"></div>
+          <div>
+            <h2 class="pi-name">Noh, Junghoon</h2>
+            <p class="pi-role">Associate Professor, Ph.D.</p>
+            <a class="pi-mail" href="mailto:jh.noh@cbnu.ac.kr">jh.noh@cbnu.ac.kr</a>
+            <div class="deflist">
+              <div>
+                <h4>Education</h4>
+                <ul>
+                  <li><b>B.S.</b> Korea University, Electrical Engineering <span class="yr">2002.3 &ndash; 2009.2</span></li>
+                  <li><b>Ph.D.</b> Korea University, Electrical Engineering <span class="yr">2009.9 &ndash; 2014.2</span></li>
+                </ul>
+              </div>
+              <div>
+                <h4>Experience</h4>
+                <ul>
+                  <li><b>Staff Engineer</b>, Agency for Defense Development <span class="yr">2014.2 &ndash; 2021.2</span></li>
+                  <li><b>Assistant Professor</b>, School of Electrical Engineering, Kumoh National Institute of Technology <span class="yr">2021.3 &ndash; 2023.8</span></li>
+                  <li><b>Associate Professor</b>, School of Semiconductor Engineering, Chungbuk National University <span class="yr">2023.9 &ndash; present</span></li>
+                </ul>
+              </div>
+              <div>
+                <h4>Honors &amp; Awards</h4>
+                <ul>
+                  <li>Qualcomm Ph.D. Fellowship <span class="yr">$50,000 for 2 years, 2010</span></li>
+                  <li>국방부장관표창, 국방부 &mdash; 유도무기 개발 및 수출 유공 <span class="yr">2019</span></li>
+                  <li>2022 KICS Best Paper Award <span class="yr">한국통신학회 하계종합학술대회 우수논문상</span></li>
+                  <li>2024 J-DQS Best Paper Award <span class="yr">국방품질연구논집 우수논문상</span></li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="band">
+      <div class="grid-rail">
+        <div class="rail-label"><span class="eyebrow">Current Members</span><div class="rule"></div></div>
+        <div class="stack" style="gap:30px">
+          <div class="rgroup">
+            <h4>Graduate Students &middot; M.S.</h4>
+            <div class="namegrid">
+              <span>Yoo, Jisang</span>
+              <span>Choi, Yujin</span>
+              <span>Oh, Dongha</span>
+            </div>
+          </div>
+          <div class="rgroup">
+            <h4>Undergraduate Researchers</h4>
+            <div class="namegrid">
+              <span>Lee, Seong-min</span>
+              <span>Jeon, Hee-seok</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="band last">
+      <div class="grid-rail">
+        <div class="rail-label"><span class="eyebrow">Alumni</span><div class="rule"></div></div>
+        <div class="alumni">
+          <div class="alum"><span class="nm">Sun, Seung-woo</span><span class="dg">B.S. KIT 2024 &middot; M.S. CBNU 2026</span><span class="po">Lumir</span></div>
+          <div class="alum"><span class="nm">Lee, Minhyeok</span><span class="dg">B.S. CBNU, 2025</span><span class="po">LG Energy Solution</span></div>
+          <div class="alum"><span class="nm">Kwon, Min-seong</span><span class="dg">B.S. KIT 2023 &middot; M.S. UNIST 2025</span><span class="po">Hyundai Mobis</span></div>
+          <div class="alum"><span class="nm">Song, Hyun-seok</span><span class="dg">B.S. KIT, 2023</span><span class="po">LIG Nex1</span></div>
+          <div class="alum"><span class="nm">Moon, Yong-gen</span><span class="dg">M.S. KIT, 2023</span><span class="po">Anycell Corporation</span></div>
+          <div class="alum"><span class="nm">Kim, Nam-woo</span><span class="dg">M.S. KIT, 2023</span><span class="po">SL Corporation</span></div>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
+
+<!-- ======================= PROJECTS ======================= -->
+<div class="page" id="page-projects">
+  <div class="wrap">
+    <section class="band">
+      <div class="grid-rail">
+        <div class="rail-label"><span class="eyebrow">Ongoing</span><div class="rule"></div></div>
+        <div class="stack" style="gap:20px">
+          <article class="proj">
+            <div class="proj-head">
+              <div class="proj-meta"><span class="pill on">Ongoing</span><span class="pill org">(주)애니셀</span><span class="pill org">2025 &ndash; 2027</span></div>
+              <h3>Barkhausen-based Security Document Detection &mdash; Edge-AI Model Development</h3>
+              <p class="ko-title">바크하우젠 자기신호 기반 보안용지 검출 딥러닝 모델 개발 (보안게이트 신호탐지 AI 엣지 모델)</p>
+            </div>
+            <details class="proj-more">
+              <summary>연구 내용</summary>
+              <div class="proj-body">
+                <p class="prose">보안용지의 연자성 띠가 만드는 바크하우젠 신호는 휴대폰·태블릿 같은 동반 금속의 신호에 쉽게 묻혀, 기존 규칙 기반 검출기는 동반 물체가 있을 때 탐지율이 크게 떨어집니다. 본 과제는 손설계 Diff 필터에서 출발하는 학습형 프런트엔드와 CNN/Conformer 인코더, 오토인코더 규제를 결합한 판정 모델을 개발했습니다.</p>
+                <h4>주요 결과</h4>
+                <ul>
+                  <li>학습에 없던 물체 21종 교차검증에서 이벤트 AUC 0.916</li>
+                  <li>오탐 10% 동일 조건에서 탐지율 46.4% &rarr; 79.3% (규칙 대비 1.7배), 종이 단독 93.8%</li>
+                  <li>실측 359파일 &middot; 13,763 이벤트 데이터셋 구축</li>
+                </ul>
+                <h4>다음 단계</h4>
+                <ul>
+                  <li>이중 주파수 혼합(FMMD) 측정으로 휴대폰&middot;태블릿 동반 조건의 물리적 한계 돌파</li>
+                  <li>여기 생성&middot;실시간 DSP&middot;온칩 추론을 단일 FPGA(Zynq-7020)에 통합</li>
+                </ul>
+              </div>
+            </details>
+          </article>
+          <article class="proj">
+            <div class="proj-head">
+              <div class="proj-meta"><span class="pill on">Ongoing</span><span class="pill org">(주)오앤비스페이스</span><span class="pill org">2026.07 &ndash; 2028.06</span><span class="pill role">2028.07 SpaceX 발사 예정</span></div>
+              <h3>X-band 송신기 개발 &mdash; 임베디드 프로그래밍 / 신호처리 로직 개발</h3>
+              <p class="ko-title">오앤비스페이스 저궤도 위성에 탑재되어 2028년 7월 SpaceX 발사체로 발사 예정</p>
+            </div>
+          </article>
+          <article class="proj">
+            <div class="proj-head">
+              <div class="proj-meta"><span class="pill on">Ongoing</span><span class="pill org">한국전자통신연구원 (ETRI)</span><span class="pill org">2026.05 &ndash; 2026.11</span></div>
+              <h3>MU-MIMO를 위한 Upper Mid-Band E-MIMO System Level Simulator 제작</h3>
+            </div>
+          </article>
+          <article class="proj">
+            <div class="proj-head">
+              <div class="proj-meta"><span class="pill on">Ongoing</span><span class="pill org">한국연구재단 (과학기술정보통신부)</span><span class="pill org">2026.03 &ndash; 2027.02</span><span class="pill role">1차년도 / 3년</span></div>
+              <h3>테라바이트 전송을 위한 초소형 위성 광통신 기술 고도화</h3>
+            </div>
+          </article>
+          <article class="proj">
+            <div class="proj-head">
+              <div class="proj-meta"><span class="pill on">Ongoing</span><span class="pill org">국방기술진흥연구소</span><span class="pill org">2022.12 &ndash; 2028.11</span><span class="pill role">참여</span><span class="pill role">2단계 2차년도</span></div>
+              <h3>Research on Space Communication and Transceiver Systems for Supporting Heterogeneous Satellite Constellations</h3>
+              <p class="ko-title">이종 위성군 지원을 위한 우주 통신 연구실 / 송수신 시스템 연구<br>2026년도: (초)소형 관측 위성용 데이터 송/수신 시스템 연구</p>
+            </div>
+            <details class="proj-more">
+              <summary>연구 배경 및 내용</summary>
+              <div class="proj-body">
+                <p class="prose">우주 탐사 및 위성 통신 분야에서 대규모 데이터 전송의 필요성이 증가하면서 기존 RF 기반 통신 기술의
+                한계를 극복하기 위한 광통신 기술이 주목받고 있습니다. CCSDS(Consultative Committee for Space Data Systems)는
+                이러한 요구를 충족하기 위해 광통신 시스템의 설계 및 운영을 위한 표준을 제시하고 있습니다. 본 연구는 CCSDS 표준을
+                기반으로 광통신 시스템을 설계하며, 특히 FPGA를 활용한 고속 모뎀 설계에 중점을 두고 있습니다.</p>
+                <h4>CCSDS 표준 기반 시스템 설계</h4>
+                <ul>
+                  <li>CCSDS가 제안하는 데이터 링크 계층 구조 및 프레임 포맷을 준수하여 광통신 시스템 설계</li>
+                  <li>표준화된 설계를 통해 상호운용성과 데이터 전송 효율성을 극대화</li>
+                </ul>
+                <h4>FPGA 기반 광통신 모뎀 설계</h4>
+                <ul>
+                  <li>FPGA 플랫폼 활용 &mdash; 실시간 처리와 고속 데이터 전송 구현</li>
+                  <li>직렬/병렬 데이터 처리 &mdash; FPGA의 병렬 처리 구조로 대용량 데이터 처리 성능 강화</li>
+                </ul>
+                <h4>정밀 추적 및 정렬 시스템</h4>
+                <ul>
+                  <li>지상국 및 위성 간 안정적인 통신을 위한 FPGA 기반 실시간 정밀 광학 추적 및 정렬 시스템 개발</li>
+                </ul>
+              </div>
+            </details>
+          </article>
+          <article class="proj">
+            <div class="proj-head">
+              <div class="proj-meta"><span class="pill on">Ongoing</span><span class="pill org">BK21</span><span class="pill org">2020.09 &ndash; 2027.08</span></div>
+              <h3>BK21 충북정보기술교육연구단 참여교수</h3>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="band last">
+      <div class="grid-rail">
+        <div class="rail-label"><span class="eyebrow">Completed</span><div class="rule"></div></div>
+        <div class="stack" style="gap:20px">
+          <article class="proj">
+            <div class="proj-head">
+              <div class="proj-meta"><span class="pill off">Completed</span><span class="pill org">한국전자통신연구원 (ETRI)</span><span class="pill org">2025.03 &ndash; 2025.11</span></div>
+              <h3>Extreme Massive MIMO (E-MIMO) System Level Simulator Development</h3>
+            </div>
+            <details class="proj-more">
+              <summary>연구 내용</summary>
+              <div class="proj-body">
+                <p class="prose">수백~수천 개의 안테나를 사용하는 Extreme Massive MIMO(E-MIMO)는 초밀집 사용자 환경과 고속 이동 시나리오에서도 스펙트럼 효율과 네트워크 용량을 끌어올리는 6G의 핵심 기술입니다. 본 과제는 E-MIMO의 설계와 최적화를 뒷받침할 System Level Simulator를 개발합니다. 도심·교외·고속 이동 등 다양한 채널 환경을 반영해 빔포밍, 사용자 스케줄링, 전력 제어의 성능을 정밀하게 평가하고, 주파수 효율과 에너지 효율 같은 핵심 지표를 검증함으로써 6G 네트워크의 성능 분석과 자원 관리 최적화에 활용됩니다.</p>
+              </div>
+            </details>
+          </article>
+          <article class="proj">
+            <div class="proj-head">
+              <div class="proj-meta"><span class="pill off">Completed</span><span class="pill org">한국통신학회 신호처리연구회</span><span class="pill org">2025.02 &ndash; 2025.11</span></div>
+              <h3>Study on PSK Signal Reception Algorithm Optimized for HF Channel Environments</h3>
+            </div>
+            <details class="proj-more">
+              <summary>연구 내용</summary>
+              <div class="proj-body">
+                <p class="prose">본 연구는 HF 채널 환경에 최적화된 PSK 신호 수신 알고리즘을 개발하는 것을 목표로 한다.
+                이를 위해 AGC(Automatic Gain Control), 이퀄라이저, 타이밍 및 캐리어 복구 기술을 연구하고 각 모듈을 최적화하여,
+                HF 채널에서 발생하는 다중 경로 페이딩, 주파수 변동, 잡음 등의 복잡한 채널 특성을 극복하고자 한다.
+                또한 Multi-Carrier 시스템을 도입하여 주파수 선택적 페이딩에 대응하고 채널 자원 활용도를 높임으로써 광대역 HF 통신의
+                성능을 향상시킨다. 개발된 알고리즘은 SDR(Software Defined Radio) 모뎀을 통한 실험적 검증을 수행함으로써 연구 결과의
+                신뢰성과 기술적 완성도를 확보한다.</p>
+              </div>
+            </details>
+          </article>
+          <article class="proj">
+            <div class="proj-head">
+              <div class="proj-meta"><span class="pill off">Completed</span><span class="pill org">Samsung Electronics</span><span class="pill org">2021.12 &ndash; 2022.11</span></div>
+              <h3>Deep Learning-Based Advanced Cell-phone Motor Vibration Measurement</h3>
+              <p class="ko-title">딥러닝 기반의 단말기 모터 진동 측정 고도화</p>
+            </div>
+            <details class="proj-more">
+              <summary>연구 내용</summary>
+              <div class="proj-body">
+                <p class="prose">본 과제는 휴대폰 진동 모터의 이상 유무를 정밀하게 검출하기 위해 Semi-Supervised Learning을
+                활용한 딥러닝 기반 탐지 방법을 개발하고, 이를 제조 현장에서 실시간으로 활용 가능한 응용 프로그램 형태로 구현하는 것을
+                목표로 합니다. 기존 주파수 스펙트럼 기반 방식은 새로운 이상 패턴 탐지에 한계가 있었으나, 본 연구는 소량의 이상
+                데이터를 사용해 Unsupervised Learning 성능을 개선하여 문제를 해결했습니다.</p>
+                <p class="prose" style="margin-top:12px">개발된 Anomaly Detector는 정상 진동 패턴을 학습하는 동시에 이상 데이터를
+                활용해 다양한 이상 상황을 정밀하게 탐지하도록 설계되었습니다. 이를 통해 99%의 이상 진동 검출 정확도를 달성하며,
+                기존 방식 대비 민감도와 정확성에서 뛰어난 성능을 입증했습니다. 또한 실시간 분석 및 결과 제공이 가능한 응용
+                프로그램으로 제작되어, 현장에서의 품질 관리 효율성을 크게 향상시켰습니다.</p>
+              </div>
+            </details>
+          </article>
+          <div>
+            <div class="proj-simple"><span class="t">모바일 자유공간 광통신의 초정밀 빔정렬기법</span><span class="m">한국연구재단 &middot; 21.09&ndash;24.02</span></div>
+            <div class="proj-simple"><span class="t">Tbps 시스템레벨 시뮬레이터 개발</span><span class="m">한국전자통신연구원 &middot; 22.06&ndash;23.11</span></div>
+            <div class="proj-simple"><span class="t">보안용지 검출력 향상을 위한 신호처리 기법 개발</span><span class="m">신용보증기금 / ㈜애니셀 &middot; 21.05&ndash;21.11</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
+
+<!-- ======================= PUBLICATIONS ======================= -->
+<div class="page" id="page-publications">
+  <div class="wrap">
+    <section class="band last">
+      <div class="grid-rail">
+        <div class="rail-label"><span class="eyebrow">Publications</span><div class="rule"></div></div>
+        <div class="stack-lg">
+          <div class="stack" style="gap:14px">
+            <h2 class="sec">Publications</h2>
+            <div class="filters" role="group" aria-label="Filter publications by type">
+              <button data-f="all" aria-pressed="true">All</button>
+              <button data-f="ij" aria-pressed="false">Int&rsquo;l Journal</button>
+              <button data-f="dj" aria-pressed="false">Domestic Journal</button>
+              <button data-f="ic" aria-pressed="false">Conference</button>
+              <button data-f="pt" aria-pressed="false">Patent</button>
+            </div>
+            <p class="note">&lowast; corresponding author</p>
+          </div>
+
+          <div class="pubgroup" data-t="ij">
+            <h3>International Journal</h3>
+            <ul class="publist">
+              <li class="pub"><span class="yr">&mdash;</span><span class="cit">G. Park, <b>J. Noh</b>&lowast;, S. Oh&lowast;, &ldquo;Distributed Localization in WSNs Using SOCP Relaxation with Linear Constraints.&rdquo;<span class="status">In preparation</span></span></li>
+              <li class="pub"><span class="yr">&mdash;</span><span class="cit">B. Lee and <b>J. Noh</b>&lowast;, &ldquo;Deep Learning based Channel Estimation and Feedback Techniques for 6G Communication Systems.&rdquo;<span class="status">Submitted</span></span></li>
+              <li class="pub"><span class="yr">2024</span><span class="cit">G. Park, <b>J. Noh</b>&lowast;, S. Oh&lowast;, &ldquo;Low-rank approximation for underwater drone localization,&rdquo; <span class="venue">ICT Express</span>, vol. 10, no. 1, Feb. 2024.<br><span class="doi">DOI 10.1016/j.icte.2023.03.010</span></span></li>
+              <li class="pub"><span class="yr">2023</span><span class="cit"><b>J. Noh</b> and B. Lee&lowast;, &ldquo;Phase-Shift Design and Channel Modeling for Focused Beams in IRS-Assisted FSO Systems,&rdquo; <span class="venue">IEEE Trans. Vehicular Technology</span>, vol. 72, no. 8, pp. 10971&ndash;10976, Aug. 2023.<br><span class="doi">DOI 10.1109/TVT.2023.3254542</span></span></li>
+              <li class="pub"><span class="yr">2023</span><span class="cit">M. Kwon, Y. Moon, B. Lee, <b>J. Noh</b>&lowast;, &ldquo;Autoencoders with exponential deviation loss for weakly supervised anomaly detection,&rdquo; <span class="venue">Pattern Recognition Letters</span>, vol. 171, pp. 131&ndash;137, Jul. 2023.<br><span class="doi">DOI 10.1016/j.patrec.2023.05.016</span></span></li>
+              <li class="pub"><span class="yr">2023</span><span class="cit">I. Lee, <b>J. Noh</b>, S. Oh&lowast;, &ldquo;A Survey and analysis on a troposcatter propagation model based on ITU-R recommendations,&rdquo; <span class="venue">ICT Express</span>, vol. 9, no. 3, pp. 507&ndash;516, Jun. 2023.<br><span class="doi">DOI 10.1016/j.icte.2022.09.009</span></span></li>
+              <li class="pub"><span class="yr">2022</span><span class="cit"><b>J. Noh</b>&lowast;, B. Lee and S. Oh, &ldquo;User-Number Threshold-based Base Station On/Off Control for Maximizing Coverage Probability,&rdquo; <span class="venue">IEEE Trans. Vehicular Technology</span>, vol. 71, no. 3, pp. 3214&ndash;3228, Mar. 2022.<br><span class="doi">DOI 10.1109/TVT.2022.3141592</span></span></li>
+              <li class="pub"><span class="yr">2020</span><span class="cit"><b>J. Noh</b>&lowast;, &ldquo;Frequency Response Analysis and Design Rules for Capacitive Feedback Transimpedance Amplifier,&rdquo; <span class="venue">IEEE Trans. Instrumentation and Measurement</span>, vol. 69, no. 12, pp. 9408&ndash;9416, Dec. 2020.<br><span class="doi">DOI 10.1109/TIM.2020.3006325</span></span></li>
+              <li class="pub"><span class="yr">2020</span><span class="cit"><b>J. Noh</b>&lowast;, &ldquo;A Capacitive Feedback Transimpedance Amplifier with a DC Feedback Loop Using a Transistor for High DC Dynamic Range,&rdquo; <span class="venue">Sensors</span>, vol. 20, no. 17, p. 4716, Aug. 2020.<br><span class="doi">DOI 10.3390/s20174716</span></span></li>
+              <li class="pub"><span class="yr">2020</span><span class="cit"><b>J. Noh</b>&lowast;, &ldquo;Rectified Gaussian noise estimation and its use in position sensitive detection systems,&rdquo; <span class="venue">IET Electronics Letters</span>, vol. 56, no. 8, pp. 390&ndash;392, Apr. 2020.<br><span class="doi">DOI 10.1049/el.2019.3324</span></span></li>
+              <li class="pub"><span class="yr">2020</span><span class="cit"><b>J. Noh</b>&lowast;, &ldquo;Optimization-Based Calibration Process for Position-Sensitive Detector Systems,&rdquo; <span class="venue">IEEE Photonics Technology Letters</span>, vol. 32, no. 6, pp. 301&ndash;304, Mar. 2020.<br><span class="doi">DOI 10.1109/LPT.2020.2973210</span></span></li>
+              <li class="pub"><span class="yr">2014</span><span class="cit"><b>J. Noh</b> and S. Oh&lowast;, &ldquo;Cognitive Radio Channel with Cooperative Multi-Antenna Secondary Systems,&rdquo; <span class="venue">IEEE J. Selected Areas in Communications</span>, vol. 32, no. 3, pp. 539&ndash;549, Mar. 2014.<br><span class="doi">DOI 10.1109/JSAC.2014.140314</span></span></li>
+              <li class="pub"><span class="yr">2013</span><span class="cit"><b>J. Noh</b> and S. Oh&lowast;, &ldquo;Beamforming in a Multi-User Cognitive Radio System with Partial Channel State Information,&rdquo; <span class="venue">IEEE Trans. Wireless Communications</span>, vol. 12, no. 2, pp. 616&ndash;625, Feb. 2013.<br><span class="doi">DOI 10.1109/TWC.2012.121812.111897</span></span></li>
+            </ul>
+          </div>
+
+          <div class="pubgroup" data-t="dj">
+            <h3>Domestic Journal</h3>
+            <ul class="publist">
+              <li class="pub"><span class="yr">2023</span><span class="cit"><b>J. Noh</b>, &ldquo;Overview and Performance Analysis of CCSDS Standard for Space Optical Communication,&rdquo; <span class="venue">Journal of Defense Quality Society</span>, vol. 5, no. 2, Dec. 2023.</span></li>
+              <li class="pub"><span class="yr">2023</span><span class="cit"><b>J. Noh</b>&lowast;, &ldquo;Trends in CCSDS Standard Technologies for Small Satellite Laser Communication,&rdquo; <span class="venue">Information and Communications Magazine</span>, vol. 40, no. 10, Oct. 2023.</span></li>
+              <li class="pub"><span class="yr">2023</span><span class="cit">Y. Moon, M. Kwon, B. Lee, <b>J. Noh</b>&lowast;, &ldquo;Performance Enhancement of Autoencoder-Based Audio Data Anomaly Detection via Weakly Supervised Learning,&rdquo; <span class="venue">J. Korean Institute of Communications and Information Sciences</span>, vol. 48, no. 3, pp. 382&ndash;390, Mar. 2023.<br><span class="doi">DOI 10.7840/kics.2023.48.3.382</span></span></li>
+              <li class="pub"><span class="yr">2022</span><span class="cit">B. Lee and <b>J. Noh</b>&lowast;, &ldquo;Communication-Computing Convergence Technique for Connected Machines,&rdquo; <span class="venue">J. Korean Institute of Communications and Information Sciences</span>, vol. 47, no. 4, Apr. 2022.<br><span class="doi">DOI 10.7840/kics.2022.47.4.611</span></span></li>
+              <li class="pub"><span class="yr">2017</span><span class="cit"><b>J. Noh</b>&lowast;, K. Cho, S. Kim, W. Kim, J. Jeong, J. Sang, C. W. Park, and M. Gong, &ldquo;Development of application for guidance and controller unit for low cost and small UAV missile based on smartphone,&rdquo; <span class="venue">J. Korean Society for Aeronautical &amp; Space Sciences</span>, vol. 45, no. 7, pp. 610&ndash;617, Jul. 2017.<br><span class="doi">DOI 10.5139/JKSAS.2017.45.7.610</span></span></li>
+            </ul>
+          </div>
+
+          <div class="pubgroup" data-t="ic">
+            <h3>International Conference</h3>
+            <ul class="publist">
+              <li class="pub"><span class="yr">2026</span><span class="cit">D. Oh, J. Yoo, Y. Choi, <b>J. Noh</b>, &ldquo;An FPGA-Based CCSDS Laser Communication Transceiver: Design and Experimental Results,&rdquo; <span class="venue">Asia-Pacific International Symposium on Aerospace Technology (APISAT 2026)</span>.</span></li>
+              <li class="pub"><span class="yr">2011</span><span class="cit"><b>J. Noh</b> and S. Oh, &ldquo;Beamforming in Cognitive Radio with Partial Channel State Information,&rdquo; <span class="venue">IEEE GLOBECOM 2011</span>, Houston, TX, USA.<br><span class="doi">DOI 10.1109/GLOCOM.2011.6134381</span></span></li>
+              <li class="pub"><span class="yr">2011</span><span class="cit"><b>J. Noh</b> and S. Oh, &ldquo;System-Level Simulation of LTE/LTE-A for IMT-Advanced Systems,&rdquo; <span class="venue">IEEE VTC Spring 2011</span>, Budapest, Hungary.<br><span class="doi">DOI 10.1109/VETECS.2011.5956445</span></span></li>
+              <li class="pub"><span class="yr">2009</span><span class="cit"><b>J. Noh</b> and S. Oh, &ldquo;Distributed SC-FDMA Resource Allocation Algorithm Based on the Hungarian Method,&rdquo; <span class="venue">IEEE VTC Fall 2009</span>, Anchorage, AK, USA.<br><span class="doi">DOI 10.1109/VETECF.2009.5378857</span></span></li>
+            </ul>
+          </div>
+
+          <div class="pubgroup" data-t="pt">
+            <h3>Patents</h3>
+            <ul class="publist">
+              <li class="pub"><span class="yr">2022</span><span class="cit"><b>전자식 착화 시스템 및 이의 제어 방법</b><br>이민석, <b>노정훈</b>, 김원섭, 안기현<br><span class="doi">등록 1024169650000 &middot; 2022.06.30</span></span></li>
+              <li class="pub"><span class="yr">2020</span><span class="cit"><b>반능동 레이저 신호를 탐지하여 표적을 추적하는 장치 및 방법</b><br><b>노정훈</b>, 이헌철, 전원보, 이민석, 공민식<br><span class="doi">등록 1021964790000 &middot; 2020.12.22</span></span></li>
+              <li class="pub"><span class="yr">2020</span><span class="cit"><b>반능동 레이저 탐지 장치의 추적각 오차를 보정하는 시스템 및 방법</b><br><b>노정훈</b>, 전원보, 이민석<br><span class="doi">등록 1021623870000 &middot; 2020.09.25</span></span></li>
+              <li class="pub"><span class="yr">2020</span><span class="cit"><b>반능동 레이저 신호를 탐지하는 장치, 방법 및 시스템</b><br>이헌철, <b>노정훈</b>, 전원보, 이민석, 공민식<br><span class="doi">등록 1020774610000 &middot; 2020.02.10</span></span></li>
+            </ul>
+          </div>
+
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div style="display:flex; align-items:center; gap:11px">
+      <svg style="width:28px;height:28px;color:var(--panel-signal)"><use href="#mk"></use></svg>
+      <div>
+        <div class="f-brand">CHIPS LAB</div>
+        <div class="f-meta">Communication Hardware &amp; Intelligent Processing Systems</div>
+      </div>
+    </div>
+    <div class="f-meta" style="text-align:right">
+      School of Semiconductor Engineering, Chungbuk National University<br>
+      <a href="mailto:jh.noh@cbnu.ac.kr">jh.noh@cbnu.ac.kr</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var PAGES=["home","research","people","projects","publications"];
+  function route(){
+    var h=(location.hash||"#home").slice(1).split("?")[0];
+    if(PAGES.indexOf(h)<0)h="home";
+    PAGES.forEach(function(p){
+      var el=document.getElementById("page-"+p);
+      if(el)el.classList.toggle("on",p===h);
+    });
+    document.querySelectorAll("nav.main a").forEach(function(a){
+      a.classList.toggle("active",a.getAttribute("href")==="#"+h);
+    });
+    var t=document.querySelector("nav.main");
+    if(t)t.classList.remove("open");
+    var b=document.querySelector(".navtoggle");
+    if(b)b.setAttribute("aria-expanded","false");
+    window.scrollTo({top:0,behavior:"instant"});
+  }
+  window.addEventListener("hashchange",route);
+  route();
+
+  var tog=document.querySelector(".navtoggle");
+  tog.addEventListener("click",function(){
+    var n=document.querySelector("nav.main");
+    var open=n.classList.toggle("open");
+    tog.setAttribute("aria-expanded",String(open));
+  });
+
+  // publication filters
+  document.querySelectorAll(".filters button").forEach(function(btn){
+    btn.addEventListener("click",function(){
+      var f=btn.dataset.f;
+      document.querySelectorAll(".filters button").forEach(function(b){
+        b.setAttribute("aria-pressed",String(b===btn));
+      });
+      document.querySelectorAll(".pubgroup").forEach(function(g){
+        g.style.display=(f==="all"||g.dataset.t===f)?"":"none";
+      });
+    });
+  });
+
+  // demo videos: respect reduced motion
+  if(window.matchMedia("(prefers-reduced-motion: reduce)").matches){
+    document.querySelectorAll("video.demo").forEach(function(v){v.removeAttribute("autoplay");v.pause();v.controls=true;});
+  }
+
+  // hero wavefield: expanding arcs from the mark's antenna node
+  var cv=document.getElementById("wavefield");
+  if(cv){
+    var ctx=cv.getContext("2d"),W=0,H=0,dpr=Math.min(window.devicePixelRatio||1,2);
+    var reduce=window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    var nodes=[];
+    function resize(){
+      var r=cv.parentElement.getBoundingClientRect();
+      W=r.width;H=r.height;
+      cv.width=W*dpr;cv.height=H*dpr;ctx.setTransform(dpr,0,0,dpr,0,0);
+      nodes=[
+        {x:W*0.80,y:H*0.86,s:1.00,ph:0.0},
+        {x:W*0.94,y:H*0.42,s:0.70,ph:1.7},
+        {x:W*0.62,y:H*0.24,s:0.52,ph:3.1}
+      ];
+    }
+    function grid(){
+      ctx.strokeStyle="rgba(255,255,255,0.035)";ctx.lineWidth=1;
+      for(var x=0;x<W;x+=44){ctx.beginPath();ctx.moveTo(x+.5,0);ctx.lineTo(x+.5,H);ctx.stroke();}
+      for(var y=0;y<H;y+=44){ctx.beginPath();ctx.moveTo(0,y+.5);ctx.lineTo(W,y+.5);ctx.stroke();}
+    }
+    function draw(t){
+      ctx.clearRect(0,0,W,H);
+      grid();
+      nodes.forEach(function(n){
+        var base=Math.max(W,H)*0.62*n.s;
+        for(var i=0;i<5;i++){
+          var p=((t/9000)+n.ph/6.283+i/5)%1;
+          var r=p*base;
+          if(r<4)continue;
+          var a=(1-p)*(1-p)*0.34*n.s;
+          ctx.beginPath();
+          ctx.arc(n.x,n.y,r,Math.PI*1.06,Math.PI*1.94);
+          ctx.strokeStyle="rgba(95,176,238,"+a.toFixed(4)+")";
+          ctx.lineWidth=(1+(1-p)*2.0)*n.s;
+          ctx.lineCap="round";
+          ctx.stroke();
+        }
+        ctx.beginPath();ctx.arc(n.x,n.y,3.2*n.s,0,6.284);
+        ctx.fillStyle="rgba(95,176,238,0.75)";ctx.fill();
+      });
+    }
+    var start=null;
+    function loop(ts){
+      if(start===null)start=ts;
+      draw(ts-start);
+      if(!reduce)requestAnimationFrame(loop);
+    }
+    resize();window.addEventListener("resize",resize);
+    if(reduce){draw(4200);}else{requestAnimationFrame(loop);}
+  }
+})();
+</script>
+
+
+</body>
+</html>
